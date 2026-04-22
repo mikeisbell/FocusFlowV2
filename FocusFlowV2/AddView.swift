@@ -65,7 +65,6 @@ struct AddView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text("What needs doing?")
                 .font(.title2)
-                .fontDesign(.serif)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 28)
                 .padding(.top, 28)
@@ -106,7 +105,6 @@ struct AddView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text("What needs doing?")
                 .font(.title2)
-                .fontDesign(.serif)
                 .fontWeight(.semibold)
                 .padding(.horizontal, 28)
                 .padding(.top, 28)

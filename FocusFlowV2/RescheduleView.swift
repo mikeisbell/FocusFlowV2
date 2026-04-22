@@ -18,7 +18,6 @@ struct RescheduleView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("No worries.")
                         .font(.title2)
-                        .fontDesign(.serif)
                         .fontWeight(.semibold)
 
                     (Text("What do you want to do with ")

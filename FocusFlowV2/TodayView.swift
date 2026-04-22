@@ -100,7 +100,6 @@ struct TaskCard: View {
 
                 Text(task.title)
                     .font(.title2)
-                    .fontDesign(.serif)
                     .fontWeight(.regular)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
