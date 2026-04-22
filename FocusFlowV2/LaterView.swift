@@ -30,28 +30,54 @@ struct LaterView: View {
             if upcomingTasks.isEmpty && finishedTasks.isEmpty {
                 emptyState
             } else {
-                List {
-                    if !upcomingTasks.isEmpty {
-                        Section("Queue") {
-                            ForEach(Array(upcomingTasks.enumerated()), id: \.element.id) { index, task in
-                                UpcomingRow(task: task, position: index + 1, isCurrent: index == 0)
-                                    .listRowBackground(AppColors.cardBackground)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        if !upcomingTasks.isEmpty {
+                            sectionHeader("Queue")
+                            VStack(spacing: 8) {
+                                ForEach(Array(upcomingTasks.enumerated()), id: \.element.id) { index, task in
+                                    UpcomingRow(task: task, position: index + 1, isCurrent: index == 0)
+                                        .padding(.vertical, 16)
+                                        .padding(.horizontal, 16)
+                                        .background(AppColors.cardBackground)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+                                        .padding(.horizontal, 24)
+                                }
+                            }
+                        }
+
+                        if !finishedTasks.isEmpty {
+                            sectionHeader("Done")
+                                .padding(.top, upcomingTasks.isEmpty ? 0 : 8)
+                            VStack(spacing: 8) {
+                                ForEach(finishedTasks) { task in
+                                    FinishedRow(task: task)
+                                        .padding(.vertical, 16)
+                                        .padding(.horizontal, 16)
+                                        .background(AppColors.cardBackground)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+                                        .padding(.horizontal, 24)
+                                }
                             }
                         }
                     }
-                    if !finishedTasks.isEmpty {
-                        Section("Done") {
-                            ForEach(finishedTasks) { task in
-                                FinishedRow(task: task)
-                                    .listRowBackground(AppColors.cardBackground)
-                            }
-                        }
-                    }
+                    .padding(.top, 8)
+                    .padding(.bottom, 24)
                 }
-                .listStyle(.insetGrouped)
-                .scrollContentBackground(.hidden)
             }
         }
+    }
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(.caption)
+            .fontWeight(.semibold)
+            .foregroundStyle(AppColors.mutedText)
+            .tracking(1)
+            .textCase(.uppercase)
+            .padding(.horizontal, 24)
     }
 
     private var emptyState: some View {
@@ -89,7 +115,6 @@ struct UpcomingRow: View {
 
             Spacer()
         }
-        .padding(.vertical, 4)
         .opacity(isCurrent ? 1.0 : 0.7)
     }
 }
@@ -110,7 +135,6 @@ struct FinishedRow: View {
 
             Spacer()
         }
-        .padding(.vertical, 4)
     }
 }
 

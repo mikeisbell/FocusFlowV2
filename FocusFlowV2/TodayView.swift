@@ -32,6 +32,7 @@ struct TodayView: View {
                     .padding(.bottom, 24)
 
                 if let task = currentTask {
+                    Spacer().frame(height: 48)
                     TaskCard(task: task)
                         .padding(.horizontal, 24)
                     Spacer()

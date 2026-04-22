@@ -10,6 +10,7 @@ struct AddView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TaskItem.orderIndex) private var allTasks: [TaskItem]
     @State private var mode: InputMode = .chooser
+    @State private var cardSize: CGFloat = 163
     @State private var taskTitle = ""
     @FocusState private var fieldFocused: Bool
 
@@ -68,15 +69,22 @@ struct AddView: View {
                 .fontWeight(.semibold)
                 .padding(.horizontal, 24)
 
-            HStack(spacing: 16) {
-                InputCard(icon: "mic.fill", label: "Speak it") {
-                    mode = .voice
+            GeometryReader { geo in
+                let size = (geo.size.width - 48 - 16) / 2
+                HStack(spacing: 16) {
+                    InputCard(icon: "mic.fill", label: "Speak it") {
+                        mode = .voice
+                    }
+                    .frame(width: size, height: size)
+                    InputCard(icon: "keyboard", label: "Type it") {
+                        mode = .keyboard
+                    }
+                    .frame(width: size, height: size)
                 }
-                InputCard(icon: "keyboard", label: "Type it") {
-                    mode = .keyboard
-                }
+                .padding(.horizontal, 24)
+                .onAppear { cardSize = size }
             }
-            .padding(.horizontal, 24)
+            .frame(height: cardSize)
         }
     }
 
@@ -137,7 +145,7 @@ struct InputCard: View {
                     .fontWeight(.medium)
                     .foregroundStyle(.primary)
             }
-            .frame(maxWidth: .infinity, minHeight: 140)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppColors.cardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 24))
             .overlay(
