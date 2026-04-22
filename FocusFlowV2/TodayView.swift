@@ -83,13 +83,15 @@ struct TaskCard: View {
                     .fontWeight(.regular)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
-                    .padding(.bottom, 32)
+
+                Spacer().frame(height: 32)
 
                 Button("Done") {
                     task.completedAt = Date()
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .padding(.bottom, 12)
+
+                Spacer().frame(height: 12)
 
                 Button("Not Now") {
                     showingReschedule = true
