@@ -103,8 +103,6 @@ struct TaskCard: View {
                     .font(.title2)
                     .fontWeight(.regular)
                     .foregroundStyle(.primary)
-                    .lineLimit(3)
-                    .truncationMode(.tail)
             }
             .padding(28)
             .frame(maxWidth: .infinity, alignment: .leading)
