@@ -60,6 +60,7 @@ struct TodayView: View {
 
 struct TaskCard: View {
     let task: TaskItem
+    @State private var showingReschedule = false
 
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -88,7 +89,7 @@ struct TaskCard: View {
                 .frame(maxWidth: .infinity)
 
                 Button("Not Now") {
-                    task.skippedAt = Date()
+                    showingReschedule = true
                 }
                 .buttonStyle(.bordered)
                 .frame(maxWidth: .infinity)
@@ -97,6 +98,9 @@ struct TaskCard: View {
         .padding(24)
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .sheet(isPresented: $showingReschedule) {
+            RescheduleView(task: task)
+        }
     }
 }
 
