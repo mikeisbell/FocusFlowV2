@@ -62,7 +62,7 @@ struct AddView: View {
     }
 
     private var chooserContent: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: 32) {
             Text("What needs doing?")
                 .font(.title2)
                 .fontDesign(.serif)
@@ -86,6 +86,7 @@ struct AddView: View {
             }
             .frame(height: cardSize)
         }
+        .padding(.top, 32)
     }
 
     private var voiceContent: some View {
