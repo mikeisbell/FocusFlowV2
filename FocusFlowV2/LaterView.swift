@@ -8,13 +8,7 @@ struct LaterView: View {
     private var todayEnd: Date { Calendar.current.date(byAdding: .day, value: 1, to: todayStart)! }
 
     private var upcomingTasks: [TaskItem] {
-        allTasks.filter { task in
-            guard let scheduled = task.scheduledFor else { return false }
-            return scheduled >= todayStart
-                && scheduled < todayEnd
-                && task.completedAt == nil
-                && task.skippedAt == nil
-        }
+        allTasks.filter { $0.completedAt == nil && $0.skippedAt == nil }
     }
 
     private var finishedTasks: [TaskItem] {
@@ -35,9 +29,9 @@ struct LaterView: View {
         } else {
             List {
                 if !upcomingTasks.isEmpty {
-                    Section("Today") {
+                    Section("Queue") {
                         ForEach(Array(upcomingTasks.enumerated()), id: \.element.id) { index, task in
-                            UpcomingRow(task: task, isCurrent: index == 0)
+                            UpcomingRow(task: task, position: index + 1, isCurrent: index == 0)
                         }
                     }
                 }
@@ -55,7 +49,7 @@ struct LaterView: View {
 
     private var emptyState: some View {
         VStack(spacing: 12) {
-            Text("Nothing scheduled yet")
+            Text("Queue is empty")
                 .foregroundStyle(.secondary)
             Text("Add a task to get started")
                 .font(.caption)
@@ -67,13 +61,8 @@ struct LaterView: View {
 
 struct UpcomingRow: View {
     let task: TaskItem
+    let position: Int
     let isCurrent: Bool
-
-    private static let timeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "h:mm a"
-        return f
-    }()
 
     var body: some View {
         HStack(spacing: 10) {
@@ -82,12 +71,10 @@ struct UpcomingRow: View {
                 .frame(width: 3)
                 .clipShape(RoundedRectangle(cornerRadius: 1.5))
 
-            if let scheduled = task.scheduledFor {
-                Text(Self.timeFormatter.string(from: scheduled))
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-                    .frame(width: 56, alignment: .leading)
-            }
+            Text("\(position)")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 24, alignment: .trailing)
 
             Text(task.title)
                 .font(.body)

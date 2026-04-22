@@ -8,6 +8,7 @@ private enum InputMode: Equatable {
 struct AddView: View {
     @Binding var selectedTab: Int
     @Environment(\.modelContext) private var modelContext
+    @Query(sort: \TaskItem.orderIndex) private var allTasks: [TaskItem]
     @State private var mode: InputMode = .chooser
     @State private var taskTitle = ""
     @FocusState private var fieldFocused: Bool
@@ -75,8 +76,10 @@ struct AddView: View {
 
     private var voiceContent: some View {
         VoiceInputView { title in
-            let slot = SchedulerService.nextAvailableSlot(after: Date())
-            let task = TaskItem(title: title, scheduledFor: slot, orderIndex: 0)
+            let task = TaskItem(
+                title: title,
+                orderIndex: SchedulerService.nextOrderIndex(in: allTasks)
+            )
             modelContext.insert(task)
             mode = .chooser
             selectedTab = 0
@@ -90,7 +93,7 @@ struct AddView: View {
                 .focused($fieldFocused)
                 .padding(.horizontal)
 
-            Button("Schedule it →") {
+            Button("Add to queue →") {
                 scheduleTask()
             }
             .buttonStyle(.borderedProminent)
@@ -100,11 +103,9 @@ struct AddView: View {
     }
 
     private func scheduleTask() {
-        let slot = SchedulerService.nextAvailableSlot(after: Date())
         let task = TaskItem(
             title: taskTitle.trimmingCharacters(in: .whitespaces),
-            scheduledFor: slot,
-            orderIndex: 0
+            orderIndex: SchedulerService.nextOrderIndex(in: allTasks)
         )
         modelContext.insert(task)
         taskTitle = ""

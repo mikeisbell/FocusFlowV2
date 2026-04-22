@@ -1,20 +1,25 @@
 # Scheduler
 
 ## Load this skill when
-Touching slot-finding logic, calendar availability queries, or auto-scheduling rules.
+Touching queue ordering, task positioning, or any logic that assigns `orderIndex`.
 
 ## Content
 
 ### Current implementation
-`SchedulerService.swift` contains a single static method: `nextAvailableSlot(after:) -> Date`. It returns the top of the next clock hour after the given date — e.g. 9:30 AM → 10:00 AM, 9:00 AM → 10:00 AM. It uses `Calendar.dateComponents` to zero out minutes/seconds/nanoseconds and increment the hour component.
+`SchedulerService.swift` contains two static methods:
 
-### Constraints discovered
-- The method strips the current hour's minutes, so any call made within an hour gets the same slot as a call at :00 of that hour. This is intentional: slots are hour-granular.
-- Crossing midnight (23:xx → 00:xx next day) is handled correctly by Calendar date arithmetic — no manual day rollover needed.
-- `orderIndex` is currently hardcoded to 0 on all tasks created through AddView. When a real queue is introduced, this method will need to return or accept a position in the day's ordered list. Do not rely on `orderIndex` being meaningful until the scheduler is fully built.
+- `nextOrderIndex(in tasks: [TaskItem]) -> Int` — returns `(tasks.map(\.orderIndex).max() ?? -1) + 1`. Use this when inserting a new task at the end of the queue.
+- `queuePosition(for task: TaskItem, in tasks: [TaskItem]) -> Int?` — returns the 1-based position of a task among all incomplete tasks (nil if the task is complete or not found).
 
-### What's not implemented yet
-- Calendar availability check (EventKit integration not yet built)
-- Day boundary enforcement (`dayStartHour` / `dayEndHour` from `UserSettings`)
-- Conflict detection (two tasks at the same hour)
-- Queue ordering beyond `orderIndex: 0`
+### Queue model
+The app uses a pure queue — no time-based scheduling. `orderIndex` is the sole ordering mechanism. Lower value = higher priority. The current task is always `allTasks.first { $0.completedAt == nil && $0.skippedAt == nil }`.
+
+### Reschedule options
+RescheduleView offers three options:
+- "Do it next": sets `task.orderIndex = (incompleteTasks.map(\.orderIndex).min() ?? 0) - 1`
+- "Do it later": sets `task.orderIndex = (allTasks.map(\.orderIndex).max() ?? 0) + 1`
+- "Skip today": sets `task.skippedAt = Date()`
+
+### Constraints
+- `orderIndex` values are not guaranteed to be contiguous — gaps are intentional (reschedule operations shift a single task without renumbering others).
+- Never renumber all tasks to close gaps; it creates unnecessary SwiftData writes.

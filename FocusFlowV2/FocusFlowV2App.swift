@@ -14,14 +14,22 @@ struct FocusFlowV2App: App {
         let schema = Schema([
             TaskItem.self,
             UserSettings.self,
-            ScheduledSlot.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(
+                for: schema,
+                migrationPlan: AppMigrationPlan.self,
+                configurations: [modelConfiguration]
+            )
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            // Fall back to a fresh container if migration fails (dev builds only)
+            do {
+                return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            } catch {
+                fatalError("Could not create ModelContainer: \(error)")
+            }
         }
     }()
 

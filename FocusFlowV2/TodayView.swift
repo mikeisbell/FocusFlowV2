@@ -9,13 +9,7 @@ struct TodayView: View {
     private var todayEnd: Date { Calendar.current.date(byAdding: .day, value: 1, to: todayStart)! }
 
     private var currentTask: TaskItem? {
-        allTasks.first { task in
-            guard let scheduled = task.scheduledFor else { return false }
-            return scheduled >= todayStart
-                && scheduled < todayEnd
-                && task.completedAt == nil
-                && task.skippedAt == nil
-        }
+        allTasks.first { $0.completedAt == nil && $0.skippedAt == nil }
     }
 
     private var doneToday: Int {
@@ -49,7 +43,7 @@ struct TodayView: View {
 
     private var emptyState: some View {
         VStack(spacing: 20) {
-            Text("Nothing scheduled yet")
+            Text("Queue is empty")
                 .foregroundStyle(.secondary)
             Button("Add a task") {
                 selectedTab = 2
@@ -62,19 +56,13 @@ struct TaskCard: View {
     let task: TaskItem
     @State private var showingReschedule = false
 
-    private static let timeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "h:mm a"
-        return f
-    }()
-
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
-            if let scheduled = task.scheduledFor {
-                Text(Self.timeFormatter.string(from: scheduled))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+            Text("UP NEXT")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+                .tracking(1)
 
             Text(task.title)
                 .font(.title)

@@ -4,9 +4,11 @@ import SwiftData
 struct RescheduleView: View {
     let task: TaskItem
     @Environment(\.dismiss) private var dismiss
-    @Query private var settings: [UserSettings]
+    @Query(sort: \TaskItem.orderIndex) private var allTasks: [TaskItem]
 
-    private var dayStartHour: Int { settings.first?.dayStartHour ?? 9 }
+    private var incompleteTasks: [TaskItem] {
+        allTasks.filter { $0.completedAt == nil && $0.skippedAt == nil }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -15,7 +17,7 @@ struct RescheduleView: View {
                     .font(.title2)
                     .fontWeight(.semibold)
 
-                (Text("When works better for ")
+                (Text("What do you want to do with ")
                     .foregroundStyle(.secondary)
                 + Text(task.title)
                     .fontWeight(.semibold)
@@ -29,18 +31,15 @@ struct RescheduleView: View {
             Divider()
 
             VStack(spacing: 0) {
-                RescheduleOption(label: "In 30 minutes") {
-                    task.scheduledFor = in30Minutes()
+                RescheduleOption(label: "Do it next") {
+                    let minIndex = incompleteTasks.map(\.orderIndex).min() ?? 0
+                    task.orderIndex = minIndex - 1
                     dismiss()
                 }
                 Divider().padding(.leading)
-                RescheduleOption(label: "Tonight") {
-                    task.scheduledFor = tonight()
-                    dismiss()
-                }
-                Divider().padding(.leading)
-                RescheduleOption(label: "Tomorrow morning") {
-                    task.scheduledFor = tomorrowMorning()
+                RescheduleOption(label: "Do it later") {
+                    let maxIndex = allTasks.map(\.orderIndex).max() ?? 0
+                    task.orderIndex = maxIndex + 1
                     dismiss()
                 }
                 Divider().padding(.leading)
@@ -54,26 +53,6 @@ struct RescheduleView: View {
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
-    }
-
-    private func in30Minutes() -> Date {
-        let target = Date().addingTimeInterval(30 * 60)
-        let fiveMin = 5.0 * 60.0
-        let rounded = (target.timeIntervalSinceReferenceDate / fiveMin).rounded() * fiveMin
-        return Date(timeIntervalSinceReferenceDate: rounded)
-    }
-
-    private func tonight() -> Date {
-        var c = Calendar.current.dateComponents([.year, .month, .day], from: Date())
-        c.hour = 18; c.minute = 0; c.second = 0
-        return Calendar.current.date(from: c) ?? Date()
-    }
-
-    private func tomorrowMorning() -> Date {
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        var c = Calendar.current.dateComponents([.year, .month, .day], from: tomorrow)
-        c.hour = dayStartHour; c.minute = 0; c.second = 0
-        return Calendar.current.date(from: c) ?? Date()
     }
 }
 
