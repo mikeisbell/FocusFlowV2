@@ -11,45 +11,52 @@ struct RescheduleView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("No worries.")
-                    .font(.title2)
-                    .fontWeight(.semibold)
+        ZStack {
+            AppColors.background.ignoresSafeArea()
 
-                (Text("What do you want to do with ")
-                    .foregroundStyle(.secondary)
-                + Text(task.title)
-                    .fontWeight(.semibold)
-                + Text("?")
-                    .foregroundStyle(.secondary))
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("No worries.")
+                        .font(.title2)
+                        .fontDesign(.serif)
+                        .fontWeight(.semibold)
+
+                    (Text("What do you want to do with ")
+                        .foregroundStyle(AppColors.mutedText)
+                    + Text(task.title)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    + Text("?")
+                        .foregroundStyle(AppColors.mutedText))
+                        .font(.body)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 28)
+                .padding(.bottom, 24)
+
+                Divider()
+
+                VStack(spacing: 0) {
+                    RescheduleOption(label: "Do it next") {
+                        let minIndex = incompleteTasks.map(\.orderIndex).min() ?? 0
+                        task.orderIndex = minIndex - 1
+                        dismiss()
+                    }
+                    Divider().padding(.leading, 24)
+                    RescheduleOption(label: "Do it later") {
+                        let maxIndex = allTasks.map(\.orderIndex).max() ?? 0
+                        task.orderIndex = maxIndex + 1
+                        dismiss()
+                    }
+                    Divider().padding(.leading, 24)
+                    RescheduleOption(label: "Skip today", isDestructive: true) {
+                        task.skippedAt = Date()
+                        dismiss()
+                    }
+                }
+
+                Spacer()
             }
-            .padding(.horizontal)
-            .padding(.top, 28)
-            .padding(.bottom, 20)
-
-            Divider()
-
-            VStack(spacing: 0) {
-                RescheduleOption(label: "Do it next") {
-                    let minIndex = incompleteTasks.map(\.orderIndex).min() ?? 0
-                    task.orderIndex = minIndex - 1
-                    dismiss()
-                }
-                Divider().padding(.leading)
-                RescheduleOption(label: "Do it later") {
-                    let maxIndex = allTasks.map(\.orderIndex).max() ?? 0
-                    task.orderIndex = maxIndex + 1
-                    dismiss()
-                }
-                Divider().padding(.leading)
-                RescheduleOption(label: "Skip today") {
-                    task.skippedAt = Date()
-                    dismiss()
-                }
-            }
-
-            Spacer()
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
@@ -58,6 +65,7 @@ struct RescheduleView: View {
 
 struct RescheduleOption: View {
     let label: String
+    var isDestructive: Bool = false
     let action: () -> Void
 
     var body: some View {
@@ -65,14 +73,14 @@ struct RescheduleOption: View {
             HStack {
                 Text(label)
                     .font(.body)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(isDestructive ? .secondary : .primary)
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppColors.mutedText)
             }
             .frame(minHeight: 56)
-            .padding(.horizontal)
+            .padding(.horizontal, 24)
         }
         .buttonStyle(.plain)
     }

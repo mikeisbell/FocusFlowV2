@@ -14,26 +14,30 @@ struct AddView: View {
     @FocusState private var fieldFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            backRow
-            Group {
-                switch mode {
-                case .chooser: chooserContent
-                case .voice:   voiceContent
-                case .keyboard: keyboardContent
+        ZStack {
+            AppColors.background.ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: 0) {
+                backRow
+                Group {
+                    switch mode {
+                    case .chooser:  chooserContent
+                    case .voice:    voiceContent
+                    case .keyboard: keyboardContent
+                    }
                 }
+                Spacer()
             }
-            Spacer()
-        }
-        .padding(.top, 16)
-        .animation(.easeInOut(duration: 0.2), value: mode)
-        .onChange(of: mode) { _, newMode in
-            if newMode == .keyboard {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    fieldFocused = true
+            .padding(.top, 16)
+            .animation(.easeInOut(duration: 0.2), value: mode)
+            .onChange(of: mode) { _, newMode in
+                if newMode == .keyboard {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        fieldFocused = true
+                    }
+                } else {
+                    fieldFocused = false
                 }
-            } else {
-                fieldFocused = false
             }
         }
     }
@@ -47,8 +51,9 @@ struct AddView: View {
                 } label: {
                     Image(systemName: "chevron.left")
                         .fontWeight(.semibold)
+                        .foregroundStyle(AppColors.accent)
                 }
-                .padding(.leading)
+                .padding(.leading, 24)
             }
             Spacer()
         }
@@ -59,8 +64,9 @@ struct AddView: View {
         VStack(alignment: .leading, spacing: 24) {
             Text("What needs doing?")
                 .font(.title2)
+                .fontDesign(.serif)
                 .fontWeight(.semibold)
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
 
             HStack(spacing: 16) {
                 InputCard(icon: "mic.fill", label: "Speak it") {
@@ -70,7 +76,7 @@ struct AddView: View {
                     mode = .keyboard
                 }
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 24)
         }
     }
 
@@ -91,14 +97,14 @@ struct AddView: View {
             TextField("Describe the task…", text: $taskTitle, axis: .vertical)
                 .font(.title3)
                 .focused($fieldFocused)
-                .padding(.horizontal)
+                .padding(.horizontal, 24)
 
             Button("Add to queue →") {
                 scheduleTask()
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(PrimaryButtonStyle())
             .disabled(taskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
-            .padding(.horizontal)
+            .padding(.horizontal, 24)
         }
     }
 
@@ -118,21 +124,36 @@ struct InputCard: View {
     let icon: String
     let label: String
     let action: () -> Void
+    @GestureState private var isPressing = false
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 36))
+                    .foregroundStyle(AppColors.accent)
                 Text(label)
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundStyle(.primary)
             }
             .frame(maxWidth: .infinity, minHeight: 140)
-            .background(.regularMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .background(AppColors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .overlay(
+                RoundedRectangle(cornerRadius: 24)
+                    .strokeBorder(
+                        AppColors.accent.opacity(isPressing ? 1.0 : 0.2),
+                        lineWidth: 1.5
+                    )
+            )
+            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
         }
         .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .updating($isPressing) { _, state, _ in state = true }
+        )
     }
 }
 

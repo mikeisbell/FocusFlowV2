@@ -20,23 +20,26 @@ struct TodayView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("\(doneToday) done today")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal)
-                .padding(.top, 16)
-                .padding(.bottom, 12)
+        ZStack {
+            AppColors.background.ignoresSafeArea()
 
-            if let task = currentTask {
-                TaskCard(task: task)
-                    .padding(.horizontal)
-                Spacer()
-            } else {
-                Spacer()
-                emptyState
-                    .frame(maxWidth: .infinity)
-                Spacer()
+            VStack(alignment: .leading, spacing: 0) {
+                Text("\(doneToday) done today")
+                    .font(.caption)
+                    .foregroundStyle(AppColors.mutedText)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 24)
+
+                if let task = currentTask {
+                    TaskCard(task: task)
+                        .padding(.horizontal, 24)
+                    Spacer()
+                } else {
+                    Spacer()
+                    emptyState.frame(maxWidth: .infinity)
+                    Spacer()
+                }
             }
         }
     }
@@ -44,10 +47,12 @@ struct TodayView: View {
     private var emptyState: some View {
         VStack(spacing: 20) {
             Text("Queue is empty")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.mutedText)
             Button("Add a task") {
                 selectedTab = 2
             }
+            .buttonStyle(PrimaryButtonStyle())
+            .frame(width: 180)
         }
     }
 }
@@ -57,35 +62,42 @@ struct TaskCard: View {
     @State private var showingReschedule = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            Text("UP NEXT")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
-                .tracking(1)
+        ZStack(alignment: .topTrailing) {
+            Circle()
+                .fill(AppColors.accent.opacity(0.06))
+                .frame(width: 120, height: 120)
+                .offset(x: 30, y: -30)
 
-            Text(task.title)
-                .font(.title)
-                .fontDesign(.serif)
-                .fontWeight(.regular)
+            VStack(alignment: .leading, spacing: 24) {
+                Text("UP NEXT")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(AppColors.mutedText)
+                    .tracking(1)
 
-            VStack(spacing: 12) {
-                Button("Done") {
-                    task.completedAt = Date()
+                Text(task.title)
+                    .font(.title)
+                    .fontDesign(.serif)
+                    .fontWeight(.regular)
+                    .foregroundStyle(.primary)
+
+                VStack(spacing: 12) {
+                    Button("Done") {
+                        task.completedAt = Date()
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+
+                    Button("Not Now") {
+                        showingReschedule = true
+                    }
+                    .buttonStyle(OutlineButtonStyle())
                 }
-                .buttonStyle(.borderedProminent)
-                .frame(maxWidth: .infinity)
-
-                Button("Not Now") {
-                    showingReschedule = true
-                }
-                .buttonStyle(.bordered)
-                .frame(maxWidth: .infinity)
             }
+            .padding(28)
         }
-        .padding(24)
-        .background(.regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .background(AppColors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .shadow(color: .black.opacity(0.08), radius: 16, x: 0, y: 4)
         .sheet(isPresented: $showingReschedule) {
             RescheduleView(task: task)
         }

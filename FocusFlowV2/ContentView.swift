@@ -22,6 +22,7 @@ struct ContentView: View {
                 .tabItem { Label("Add", systemImage: "plus.circle.fill") }
                 .tag(2)
         }
+        .tint(AppColors.accent)
     }
 }
 

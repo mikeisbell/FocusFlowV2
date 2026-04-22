@@ -24,36 +24,43 @@ struct LaterView: View {
     }
 
     var body: some View {
-        if upcomingTasks.isEmpty && finishedTasks.isEmpty {
-            emptyState
-        } else {
-            List {
-                if !upcomingTasks.isEmpty {
-                    Section("Queue") {
-                        ForEach(Array(upcomingTasks.enumerated()), id: \.element.id) { index, task in
-                            UpcomingRow(task: task, position: index + 1, isCurrent: index == 0)
+        ZStack {
+            AppColors.background.ignoresSafeArea()
+
+            if upcomingTasks.isEmpty && finishedTasks.isEmpty {
+                emptyState
+            } else {
+                List {
+                    if !upcomingTasks.isEmpty {
+                        Section("Queue") {
+                            ForEach(Array(upcomingTasks.enumerated()), id: \.element.id) { index, task in
+                                UpcomingRow(task: task, position: index + 1, isCurrent: index == 0)
+                                    .listRowBackground(AppColors.cardBackground)
+                            }
+                        }
+                    }
+                    if !finishedTasks.isEmpty {
+                        Section("Done") {
+                            ForEach(finishedTasks) { task in
+                                FinishedRow(task: task)
+                                    .listRowBackground(AppColors.cardBackground)
+                            }
                         }
                     }
                 }
-                if !finishedTasks.isEmpty {
-                    Section("Done") {
-                        ForEach(finishedTasks) { task in
-                            FinishedRow(task: task)
-                        }
-                    }
-                }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
             }
-            .listStyle(.insetGrouped)
         }
     }
 
     private var emptyState: some View {
         VStack(spacing: 12) {
             Text("Queue is empty")
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.mutedText)
             Text("Add a task to get started")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(AppColors.mutedText.opacity(0.7))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -65,23 +72,25 @@ struct UpcomingRow: View {
     let isCurrent: Bool
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Rectangle()
-                .fill(isCurrent ? Color.purple : Color.clear)
+                .fill(isCurrent ? AppColors.accent : Color.clear)
                 .frame(width: 3)
                 .clipShape(RoundedRectangle(cornerRadius: 1.5))
 
             Text("\(position)")
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.mutedText)
                 .frame(width: 24, alignment: .trailing)
 
             Text(task.title)
                 .font(.body)
+                .foregroundStyle(isCurrent ? .primary : .secondary)
 
             Spacer()
         }
-        .opacity(isCurrent ? 1.0 : 0.6)
+        .padding(.vertical, 4)
+        .opacity(isCurrent ? 1.0 : 0.7)
     }
 }
 
@@ -89,18 +98,19 @@ struct FinishedRow: View {
     let task: TaskItem
 
     var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "checkmark")
+        HStack(spacing: 12) {
+            Image(systemName: "checkmark.circle.fill")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.doneGreen)
                 .frame(width: 16)
 
             Text(task.title)
                 .strikethrough()
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppColors.mutedText)
 
             Spacer()
         }
+        .padding(.vertical, 4)
     }
 }
 
