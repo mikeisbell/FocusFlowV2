@@ -31,17 +31,13 @@ struct LaterView: View {
                 emptyState
             } else {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 0) {
                         if !upcomingTasks.isEmpty {
                             sectionHeader("Queue")
-                            VStack(spacing: 8) {
+                                .padding(.top, 24)
+                            VStack(spacing: 10) {
                                 ForEach(Array(upcomingTasks.enumerated()), id: \.element.id) { index, task in
-                                    UpcomingRow(task: task, position: index + 1, isCurrent: index == 0)
-                                        .padding(.vertical, 16)
-                                        .padding(.horizontal, 16)
-                                        .background(AppColors.cardBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                                        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+                                    UpcomingRow(task: task, isCurrent: index == 0)
                                         .padding(.horizontal, 24)
                                 }
                             }
@@ -49,22 +45,16 @@ struct LaterView: View {
 
                         if !finishedTasks.isEmpty {
                             sectionHeader("Done")
-                                .padding(.top, upcomingTasks.isEmpty ? 0 : 8)
-                            VStack(spacing: 8) {
+                                .padding(.top, 28)
+                            VStack(spacing: 10) {
                                 ForEach(finishedTasks) { task in
                                     FinishedRow(task: task)
-                                        .padding(.vertical, 16)
-                                        .padding(.horizontal, 16)
-                                        .background(AppColors.cardBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                                        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
                                         .padding(.horizontal, 24)
                                 }
                             }
                         }
                     }
-                    .padding(.top, 16)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 100)
                 }
             }
         }
@@ -72,12 +62,13 @@ struct LaterView: View {
 
     private func sectionHeader(_ title: String) -> some View {
         Text(title)
-            .font(.caption)
+            .font(.caption2)
             .fontWeight(.semibold)
             .foregroundStyle(AppColors.mutedText)
-            .tracking(1)
+            .tracking(1.5)
             .textCase(.uppercase)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 28)
+            .padding(.bottom, 12)
     }
 
     private var emptyState: some View {
@@ -94,28 +85,29 @@ struct LaterView: View {
 
 struct UpcomingRow: View {
     let task: TaskItem
-    let position: Int
     let isCurrent: Bool
 
     var body: some View {
-        HStack(spacing: 12) {
-            Rectangle()
+        HStack(spacing: 0) {
+            RoundedRectangle(cornerRadius: 2)
                 .fill(isCurrent ? AppColors.accent : Color.clear)
-                .frame(width: 3)
-                .clipShape(RoundedRectangle(cornerRadius: 1.5))
+                .frame(width: 4, height: 44)
+                .padding(.trailing, 14)
 
-            Text("\(position)")
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(AppColors.mutedText)
-                .frame(width: 24, alignment: .trailing)
-
-            Text(task.title)
-                .font(.body)
-                .foregroundStyle(isCurrent ? .primary : .secondary)
-
+            VStack(alignment: .leading, spacing: 3) {
+                Text(task.title)
+                    .font(.body)
+                    .fontWeight(isCurrent ? .medium : .regular)
+                    .foregroundStyle(isCurrent ? Color.primary : Color.secondary)
+            }
             Spacer()
         }
-        .opacity(isCurrent ? 1.0 : 0.7)
+        .padding(.vertical, 18)
+        .padding(.horizontal, 20)
+        .background(AppColors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .opacity(isCurrent ? 1.0 : 0.65)
     }
 }
 
@@ -125,16 +117,19 @@ struct FinishedRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "checkmark.circle.fill")
-                .font(.caption)
+                .font(.body)
                 .foregroundStyle(AppColors.doneGreen)
-                .frame(width: 16)
-
             Text(task.title)
-                .strikethrough()
+                .font(.body)
+                .strikethrough(true, color: AppColors.mutedText)
                 .foregroundStyle(AppColors.mutedText)
-
             Spacer()
         }
+        .padding(.vertical, 18)
+        .padding(.horizontal, 20)
+        .background(AppColors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
 }
 

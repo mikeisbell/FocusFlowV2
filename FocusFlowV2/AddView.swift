@@ -10,7 +10,7 @@ struct AddView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \TaskItem.orderIndex) private var allTasks: [TaskItem]
     @State private var mode: InputMode = .chooser
-    @State private var cardSize: CGFloat = 163
+    @State private var cardSize: CGFloat = 159
     @State private var taskTitle = ""
     @FocusState private var fieldFocused: Bool
 
@@ -51,10 +51,10 @@ struct AddView: View {
                     mode = .chooser
                 } label: {
                     Image(systemName: "chevron.left")
-                        .fontWeight(.semibold)
+                        .font(.title3)
                         .foregroundStyle(AppColors.accent)
                 }
-                .padding(.leading, 24)
+                .padding(.leading, 28)
             }
             Spacer()
         }
@@ -62,31 +62,32 @@ struct AddView: View {
     }
 
     private var chooserContent: some View {
-        VStack(alignment: .leading, spacing: 32) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("What needs doing?")
                 .font(.title2)
                 .fontDesign(.serif)
                 .fontWeight(.semibold)
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 28)
+                .padding(.top, 28)
+                .padding(.bottom, 36)
 
             GeometryReader { geo in
-                let size = (geo.size.width - 48 - 16) / 2
+                let size = (geo.size.width - 56 - 16) / 2
                 HStack(spacing: 16) {
-                    InputCard(icon: "mic.fill", label: "Speak it") {
+                    InputCard(icon: "mic.fill", label: "Speak it", sublabel: "Fastest") {
                         mode = .voice
                     }
                     .frame(width: size, height: size)
-                    InputCard(icon: "keyboard", label: "Type it") {
+                    InputCard(icon: "keyboard", label: "Type it", sublabel: "Your way") {
                         mode = .keyboard
                     }
                     .frame(width: size, height: size)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 28)
                 .onAppear { cardSize = size }
             }
             .frame(height: cardSize)
         }
-        .padding(.top, 32)
     }
 
     private var voiceContent: some View {
@@ -102,18 +103,48 @@ struct AddView: View {
     }
 
     private var keyboardContent: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            TextField("Describe the task…", text: $taskTitle, axis: .vertical)
-                .font(.title3)
-                .focused($fieldFocused)
-                .padding(.horizontal, 24)
+        VStack(alignment: .leading, spacing: 0) {
+            Text("What needs doing?")
+                .font(.title2)
+                .fontDesign(.serif)
+                .fontWeight(.semibold)
+                .padding(.horizontal, 28)
+                .padding(.top, 28)
+                .padding(.bottom, 36)
+
+            ZStack(alignment: .topLeading) {
+                TextEditor(text: $taskTitle)
+                    .font(.body)
+                    .scrollContentBackground(.hidden)
+                    .focused($fieldFocused)
+                    .padding(16)
+                    .frame(minHeight: 120)
+
+                if taskTitle.isEmpty {
+                    Text("Describe the task…")
+                        .font(.body)
+                        .foregroundStyle(AppColors.mutedText.opacity(0.6))
+                        .padding(.horizontal, 20)
+                        .padding(.top, 24)
+                        .allowsHitTesting(false)
+                }
+            }
+            .background(AppColors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(AppColors.accent.opacity(0.3), lineWidth: 1.5)
+            )
+            .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
+            .padding(.horizontal, 28)
+            .padding(.bottom, 24)
 
             Button("Add to queue →") {
                 scheduleTask()
             }
             .buttonStyle(PrimaryButtonStyle())
             .disabled(taskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 28)
         }
     }
 
@@ -132,19 +163,31 @@ struct AddView: View {
 struct InputCard: View {
     let icon: String
     let label: String
+    let sublabel: String
     let action: () -> Void
     @GestureState private var isPressing = false
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 36))
-                    .foregroundStyle(AppColors.accent)
-                Text(label)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.primary)
+            VStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(AppColors.accent.opacity(0.12))
+                        .frame(width: 64, height: 64)
+                    Image(systemName: icon)
+                        .font(.system(size: 26, weight: .medium))
+                        .foregroundStyle(AppColors.accent)
+                }
+
+                VStack(spacing: 4) {
+                    Text(label)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.primary)
+                    Text(sublabel)
+                        .font(.caption)
+                        .foregroundStyle(AppColors.mutedText)
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(AppColors.cardBackground)
@@ -156,7 +199,7 @@ struct InputCard: View {
                         lineWidth: 1.5
                     )
             )
-            .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 3)
         }
         .buttonStyle(.plain)
         .simultaneousGesture(

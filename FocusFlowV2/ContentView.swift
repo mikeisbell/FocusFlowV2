@@ -21,7 +21,7 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .safeAreaInset(edge: .bottom) {
-                Color.clear.frame(height: 56)
+                Color.clear.frame(height: 60)
             }
 
             CustomTabBar(selectedTab: $selectedTab)
@@ -37,20 +37,21 @@ struct CustomTabBar: View {
             TabBarButton(icon: "circle.fill", label: "Now", isSelected: selectedTab == 0) {
                 selectedTab = 0
             }
+            .frame(maxWidth: .infinity)
 
             Button {
                 selectedTab = 2
             } label: {
-                ZStack {
-                    Circle()
-                        .fill(AppColors.accentGradient)
-                        .frame(width: 56, height: 56)
-                        .shadow(color: AppColors.accent.opacity(0.35), radius: 12, x: 0, y: 4)
-                    Image(systemName: "plus")
-                        .font(.system(size: 22, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-                .offset(y: -16)
+                Circle()
+                    .fill(AppColors.accentGradient)
+                    .frame(width: 52, height: 52)
+                    .shadow(color: AppColors.accent.opacity(0.4), radius: 10, x: 0, y: 4)
+                    .overlay(
+                        Image(systemName: "plus")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(.white)
+                    )
+                    .offset(y: -14)
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity)
@@ -58,11 +59,14 @@ struct CustomTabBar: View {
             TabBarButton(icon: "list.bullet", label: "Later", isSelected: selectedTab == 1) {
                 selectedTab = 1
             }
+            .frame(maxWidth: .infinity)
         }
-        .frame(height: 56)
-        .padding(.horizontal, 16)
-        .background(AppColors.cardBackground, ignoresSafeAreaEdges: .bottom)
-        .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: -3)
+        .frame(height: 60)
+        .background(
+            AppColors.cardBackground
+                .shadow(.drop(color: .black.opacity(0.08), radius: 16, x: 0, y: -4))
+        )
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 
@@ -74,16 +78,16 @@ struct TabBarButton: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 3) {
+            VStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
                 Text(label)
                     .font(.caption2)
                     .fontWeight(.medium)
             }
-            .foregroundStyle(isSelected ? AppColors.accent : Color.secondary)
-            .frame(maxWidth: .infinity)
+            .foregroundStyle(isSelected ? AppColors.accent : Color(.tertiaryLabel))
             .padding(.top, 10)
+            .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
     }
