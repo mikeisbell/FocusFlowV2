@@ -8,8 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab = 0
+
     var body: some View {
-        Text("FocusFlowV2")
+        TabView(selection: $selectedTab) {
+            TodayView(selectedTab: $selectedTab)
+                .tabItem { Label("Now", systemImage: "circle.fill") }
+                .tag(0)
+            LaterView()
+                .tabItem { Label("Later", systemImage: "list.bullet") }
+                .tag(1)
+            AddView()
+                .tabItem { Label("Add", systemImage: "plus.circle.fill") }
+                .tag(2)
+        }
     }
 }
 
