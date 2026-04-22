@@ -32,34 +32,30 @@ struct RescheduleView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 28)
-                .padding(.bottom, 24)
+                .padding(.bottom, 32)
 
-                Divider()
-
-                VStack(spacing: 0) {
+                VStack(spacing: 12) {
                     RescheduleOption(label: "Do it next") {
                         let minIndex = incompleteTasks.map(\.orderIndex).min() ?? 0
                         task.orderIndex = minIndex - 1
                         dismiss()
                     }
-                    Divider().padding(.leading, 24)
                     RescheduleOption(label: "Do it later") {
                         let maxIndex = allTasks.map(\.orderIndex).max() ?? 0
                         task.orderIndex = maxIndex + 1
                         dismiss()
                     }
-                    Divider().padding(.leading, 24)
                     RescheduleOption(label: "Skip today", isDestructive: true) {
                         task.skippedAt = Date()
                         dismiss()
                     }
                 }
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
 
                 Spacer()
             }
         }
-        .presentationDetents([.medium])
-        .presentationDragIndicator(.visible)
     }
 }
 
@@ -73,14 +69,16 @@ struct RescheduleOption: View {
             HStack {
                 Text(label)
                     .font(.body)
-                    .foregroundStyle(isDestructive ? .secondary : .primary)
+                    .fontWeight(.medium)
+                    .foregroundStyle(isDestructive ? AppColors.mutedText : .primary)
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(AppColors.mutedText)
             }
-            .frame(minHeight: 56)
-            .padding(.horizontal, 24)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
+            .padding(.horizontal, 20)
+            .background(AppColors.cardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         }
         .buttonStyle(.plain)
     }
