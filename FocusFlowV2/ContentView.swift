@@ -18,7 +18,7 @@ struct ContentView: View {
             LaterView()
                 .tabItem { Label("Later", systemImage: "list.bullet") }
                 .tag(1)
-            AddView()
+            AddView(selectedTab: $selectedTab)
                 .tabItem { Label("Add", systemImage: "plus.circle.fill") }
                 .tag(2)
         }
