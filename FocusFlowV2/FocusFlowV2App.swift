@@ -12,7 +12,9 @@ import SwiftData
 struct FocusFlowV2App: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            TaskItem.self,
+            UserSettings.self,
+            ScheduledSlot.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
