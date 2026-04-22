@@ -29,32 +29,33 @@ struct TodayView: View {
             ZStack {
                 AppColors.background.ignoresSafeArea()
 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("\(doneToday) done · \(remainingCount) left today")
-                        .font(.caption)
-                        .foregroundStyle(AppColors.mutedText)
-                        .padding(.horizontal, 24)
-                        .padding(.top, 20)
-                        .padding(.bottom, 20)
-
-                    if let task = currentTask {
-                        TaskCard(task: task)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("\(doneToday) done · \(remainingCount) left today")
+                            .font(.caption)
+                            .foregroundStyle(AppColors.mutedText)
                             .padding(.horizontal, 24)
+                            .padding(.top, 20)
+                            .padding(.bottom, 20)
 
-                        VStack(spacing: 12) {
-                            Button("Done") { task.completedAt = Date() }
-                                .buttonStyle(PrimaryButtonStyle())
-                            Button("Not Now") { showingReschedule = true }
-                                .buttonStyle(OutlineButtonStyle())
+                        if let task = currentTask {
+                            TaskCard(task: task)
+                                .padding(.horizontal, 24)
+
+                            VStack(spacing: 12) {
+                                Button("Done") { task.completedAt = Date() }
+                                    .buttonStyle(PrimaryButtonStyle())
+                                Button("Not Now") { showingReschedule = true }
+                                    .buttonStyle(OutlineButtonStyle())
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.top, 20)
+                            .padding(.bottom, 40)
+                        } else {
+                            emptyState
+                                .frame(maxWidth: .infinity)
+                                .padding(.top, 120)
                         }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 20)
-
-                        Spacer()
-                    } else {
-                        Spacer()
-                        emptyState.frame(maxWidth: .infinity)
-                        Spacer()
                     }
                 }
                 .navigationDestination(isPresented: $showingReschedule) {
@@ -102,7 +103,8 @@ struct TaskCard: View {
                     .font(.title2)
                     .fontWeight(.regular)
                     .foregroundStyle(.primary)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(3)
+                    .truncationMode(.tail)
             }
             .padding(28)
             .frame(maxWidth: .infinity, alignment: .leading)
