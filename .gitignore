@@ -1,0 +1,11 @@
+# Secrets — never commit the API key
+FocusFlowV2/Secrets.plist
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+.build/
+
+# macOS
+.DS_Store

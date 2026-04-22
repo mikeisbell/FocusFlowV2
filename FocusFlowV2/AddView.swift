@@ -74,16 +74,13 @@ struct AddView: View {
     }
 
     private var voiceContent: some View {
-        VStack(spacing: 20) {
-            Spacer()
-            Image(systemName: "mic.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.secondary)
-            Text("Voice input coming soon")
-                .foregroundStyle(.secondary)
-            Spacer()
+        VoiceInputView { title in
+            let slot = SchedulerService.nextAvailableSlot(after: Date())
+            let task = TaskItem(title: title, scheduledFor: slot, orderIndex: 0)
+            modelContext.insert(task)
+            mode = .chooser
+            selectedTab = 0
         }
-        .frame(maxWidth: .infinity)
     }
 
     private var keyboardContent: some View {
