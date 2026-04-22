@@ -21,4 +21,4 @@ Links to `TaskItem?` with SwiftData's default `.nullify` delete rule — if the 
 This project uses `PBXFileSystemSynchronizedRootGroup` (Xcode 16). Any Swift file added to the `FocusFlowV2/` directory is automatically compiled — no need to edit `.xcodeproj`.
 
 ### ModelContainer
-`FocusFlowV2App.swift` currently registers only `Item` in the schema (Xcode default). When hooking up the real models for persistence, update that schema to include `TaskItem`, `UserSettings`, and `ScheduledSlot`. That file is Xcode-generated; confirm with the user before modifying it.
+`FocusFlowV2App.swift` registers `TaskItem`, `UserSettings`, and `ScheduledSlot`. No further schema changes needed unless a new model is added.
