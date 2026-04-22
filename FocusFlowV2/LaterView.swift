@@ -11,15 +11,17 @@ struct LaterView: View {
         allTasks.filter { $0.completedAt == nil && $0.skippedAt == nil }
     }
 
-    private var finishedTasks: [TaskItem] {
+    private var completedTasks: [TaskItem] {
         allTasks.filter { task in
-            if let completed = task.completedAt {
-                return completed >= todayStart && completed < todayEnd
-            }
-            if let skipped = task.skippedAt {
-                return skipped >= todayStart && skipped < todayEnd
-            }
-            return false
+            guard let completed = task.completedAt else { return false }
+            return completed >= todayStart && completed < todayEnd
+        }
+    }
+
+    private var skippedTasks: [TaskItem] {
+        allTasks.filter { task in
+            guard let skipped = task.skippedAt else { return false }
+            return skipped >= todayStart && skipped < todayEnd
         }
     }
 
@@ -27,7 +29,7 @@ struct LaterView: View {
         ZStack {
             AppColors.background.ignoresSafeArea()
 
-            if upcomingTasks.isEmpty && finishedTasks.isEmpty {
+            if upcomingTasks.isEmpty && completedTasks.isEmpty && skippedTasks.isEmpty {
                 emptyState
             } else {
                 ScrollView {
@@ -43,12 +45,23 @@ struct LaterView: View {
                             }
                         }
 
-                        if !finishedTasks.isEmpty {
+                        if !completedTasks.isEmpty {
                             sectionHeader("Done")
                                 .padding(.top, 28)
                             VStack(spacing: 10) {
-                                ForEach(finishedTasks) { task in
+                                ForEach(completedTasks) { task in
                                     FinishedRow(task: task)
+                                        .padding(.horizontal, 24)
+                                }
+                            }
+                        }
+
+                        if !skippedTasks.isEmpty {
+                            sectionHeader("Skipped today")
+                                .padding(.top, 28)
+                            VStack(spacing: 10) {
+                                ForEach(skippedTasks) { task in
+                                    SkippedRow(task: task)
                                         .padding(.horizontal, 24)
                                 }
                             }
@@ -122,6 +135,27 @@ struct FinishedRow: View {
             Text(task.title)
                 .font(.body)
                 .strikethrough(true, color: AppColors.mutedText)
+                .foregroundStyle(AppColors.mutedText)
+            Spacer()
+        }
+        .padding(.vertical, 18)
+        .padding(.horizontal, 20)
+        .background(AppColors.cardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+    }
+}
+
+struct SkippedRow: View {
+    let task: TaskItem
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "minus.circle")
+                .font(.body)
+                .foregroundStyle(AppColors.mutedText)
+            Text(task.title)
+                .font(.body)
                 .foregroundStyle(AppColors.mutedText)
             Spacer()
         }

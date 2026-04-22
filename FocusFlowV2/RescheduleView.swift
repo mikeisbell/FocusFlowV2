@@ -45,7 +45,7 @@ struct RescheduleView: View {
                         task.orderIndex = maxIndex + 1
                         dismiss()
                     }
-                    RescheduleOption(label: "Skip today", isDestructive: true) {
+                    RescheduleOption(label: "Skip today") {
                         task.skippedAt = Date()
                         dismiss()
                     }
@@ -61,7 +61,6 @@ struct RescheduleView: View {
 
 struct RescheduleOption: View {
     let label: String
-    var isDestructive: Bool = false
     let action: () -> Void
 
     var body: some View {
@@ -70,7 +69,7 @@ struct RescheduleOption: View {
                 Text(label)
                     .font(.body)
                     .fontWeight(.medium)
-                    .foregroundStyle(isDestructive ? AppColors.mutedText : .primary)
+                    .foregroundStyle(Color.primary)
                 Spacer()
             }
             .frame(maxWidth: .infinity)
